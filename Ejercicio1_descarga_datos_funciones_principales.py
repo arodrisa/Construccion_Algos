@@ -26,13 +26,20 @@ import random
 
 # %%
 # Variables
-nombres_indices = ["Euro Stoxx 50", "IBEX 35", "S&P 500", "DAX", "Bovespa", "Nikkei 225", "Reino Unido 100",
+# nombres_indices = ["Euro Stoxx 50", "IBEX 35", "S&P 500", "DAX", "Bovespa", "Nikkei 225", "Reino Unido 100",
+#                    "Dow Jones Industrial Average", "IBEX Medium Cap", "IBEX Small Cap", "Hang Seng"]
+# tickers_indices = ["STOXX50E", "IBEX", "SPX", "GDAXI",
+#                    "BVSP", "N225", "invuk100", "DJI", "IBEXC", "IBEXS", "HSI"]
+# urls_indices = ["https://es.investing.com/indices/eu-stoxx50-components", "https://es.investing.com/indices/spain-35-components",
+#                 "https://es.investing.com/indices/us-spx-500-components", "https://es.investing.com/indices/germany-30-components",
+#                 "https://es.investing.com/indices/bovespa-components", "https://es.investing.com/indices/japan-ni225-components",
+#                 "https://es.investing.com/indices/investing.com-uk-100-components", "https://es.investing.com/indices/us-30-components",
+#                 "https://es.investing.com/indices/ibex-medium-cap-components", "https://es.investing.com/indices/ibex-small-cap-components",
+#                 "https://es.investing.com/indices/hang-sen-40-components"]
+nombres_indices = ["Bovespa", "Nikkei 225", "Reino Unido 100",
                    "Dow Jones Industrial Average", "IBEX Medium Cap", "IBEX Small Cap", "Hang Seng"]
-tickers_indices = ["STOXX50E", "IBEX", "SPX", "GDAXI",
-                   "BVSP", "N225", "invuk100", "DJI", "IBEXC", "IBEXS", "HSI"]
-urls_indices = ["https://es.investing.com/indices/eu-stoxx50-components", "https://es.investing.com/indices/spain-35-components",
-                "https://es.investing.com/indices/us-spx-500-components", "https://es.investing.com/indices/germany-30-components",
-                "https://es.investing.com/indices/bovespa-components", "https://es.investing.com/indices/japan-ni225-components",
+tickers_indices = ["BVSP", "N225", "invuk100", "DJI", "IBEXC", "IBEXS", "HSI"]
+urls_indices = ["https://es.investing.com/indices/bovespa-components", "https://es.investing.com/indices/japan-ni225-components",
                 "https://es.investing.com/indices/investing.com-uk-100-components", "https://es.investing.com/indices/us-30-components",
                 "https://es.investing.com/indices/ibex-medium-cap-components", "https://es.investing.com/indices/ibex-small-cap-components",
                 "https://es.investing.com/indices/hang-sen-40-components"]
@@ -42,15 +49,16 @@ tabla_indices = pd.DataFrame(
 tabla_indices
 ventana = 30
 # date_time_str = "01/01/2018"
-fecha_inicio = "01/01/2018"
-fecha_fin = "31/12/2018"
+fecha_inicio = "01/01/1990"
+fecha_fin = "27/07/2020"
 ventana = 30
 user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.89 Safari/537.36'
 fecha_inicio = datetime.datetime.strptime(fecha_inicio, '%d/%m/%Y')
 fecha_fin = datetime.datetime.strptime(fecha_fin, '%d/%m/%Y')
-
+Downloaded_files_path = r'C:\Users\arodr\Google Drive\Master_MIAX\hist_data\investing'
 indice = tabla_indices.loc[1, 'urls_indices']
 url = indice
+save_in_file = False
 
 
 def encontrar_fecha_anterior_inicio(fecha_inicio, ventana):
@@ -303,7 +311,7 @@ def split_contrasplit(cotizaciones):
     return cotizaciones
 
 
-def generar_df_activos(info_activos, fecha_inicio, fecha_fin):
+def generar_df_activos(info_activos, fecha_inicio, fecha_fin, save_in_file):
     print("Iniciando el proceso de descarga de datos")
     # url_activo = "https://es.investing.com/equities/pharma-mar-sau-historical-data"
     activo = 1
@@ -326,11 +334,17 @@ def generar_df_activos(info_activos, fecha_inicio, fecha_fin):
         # Limpiamos los datos descargados.
         #   cotizaciones<-limpiar(cotizaciones)
         cotizaciones = limpiar(cotizaciones)
+        if(save_in_file):
+            filename = info_activos.loc[activo, 'Nombre'] + \
+                '_' + info_activos.loc[activo, 'ticker']
+            filename = ''.join(e for e in filename if e.isalnum())
+            cotizaciones.to_csv(filename+'.csv', sep=';')
         # Homogeneizamos los datos descargados.
         #   cotizaciones<-homogeneizar(cotizaciones, fecha_inicio, fecha_fin)
         cotizaciones = homogeneizar(cotizaciones, fecha_inicio, fecha_fin)
         # Eliminamos los split y contrasplit.
         cotizaciones = split_contrasplit(cotizaciones)
+
         if firsttime:
             firsttime = False
             apertura = pd.DataFrame(cotizaciones[['Apertura']])
@@ -405,61 +419,83 @@ def otener_info_divisa(divisa, fecha_inicio, fecha_fin):
 
 
 def obtener_info_renta_fija(fecha_inicio, fecha_fin):
-curvas_list = [
-    'Fecha', 'ECONOMIA MUNDIAL. TIPO DE INTERES DIA A DIA . MERCADOS UEM-11. INTERBANCARIO. EONIA. ']
-curvas_colnames = ['Fecha', 'Eonia']
-monthdic = {
-    "ENE": "01 ",
-    "FEB": "02 ",
-    "MAR": "03 ",
-    "ABR": "04 ",
-    "MAY": "05 ",
-    "JUN": "06 ",
-    "JUL": "07 ",
-    "AGO": "08 ",
-    "SEP": "09 ",
-    "OCT": "10 ",
-    "NOV": "11 ",
-    "DIC": "12 ",
-}
-url = 'http://www.bde.es/webbde/es/estadis/infoest/series/ti_1_7.csv'
-# use sep="," for coma separation.
-curvas = pd.read_csv(url, encoding='latin-1')
-curvas.columns = curvas.iloc[2]
-curvas.rename(columns={curvas.columns[0]: "Fecha"}, inplace=True)
+    curvas_list = [
+        'Fecha', 'ECONOMIA MUNDIAL. TIPO DE INTERES DIA A DIA . MERCADOS UEM-11. INTERBANCARIO. EONIA. ']
+    curvas_colnames = ['Fecha', 'Eonia']
+    monthdic = {
+        "ENE": "01 ",
+        "FEB": "02 ",
+        "MAR": "03 ",
+        "ABR": "04 ",
+        "MAY": "05 ",
+        "JUN": "06 ",
+        "JUL": "07 ",
+        "AGO": "08 ",
+        "SEP": "09 ",
+        "OCT": "10 ",
+        "NOV": "11 ",
+        "DIC": "12 ",
+    }
+    url = 'http://www.bde.es/webbde/es/estadis/infoest/series/ti_1_7.csv'
+    # use sep="," for coma separation.
+    curvas = pd.read_csv(url, encoding='latin-1')
+    curvas.columns = curvas.iloc[2]
+    curvas.rename(columns={curvas.columns[0]: "Fecha"}, inplace=True)
 
-curvas = curvas.iloc[5:-2, :]
-for key in monthdic:
-    curvas['Fecha'] = curvas['Fecha'].str.replace(key, monthdic[key])
+    curvas = curvas.iloc[5:-2, :]
+    for key in monthdic:
+        curvas['Fecha'] = curvas['Fecha'].str.replace(key, monthdic[key])
 
-curvas['Fecha'] = pd.to_datetime(curvas['Fecha'], format='%d %m %Y')
-curvas.set_index(curvas.loc[:, 'Fecha'].values, inplace=True)
+    curvas['Fecha'] = pd.to_datetime(curvas['Fecha'], format='%d %m %Y')
+    curvas.set_index(curvas.loc[:, 'Fecha'].values, inplace=True)
 
-curvas = curvas[curvas.columns.intersection(curvas_list)]
-curvas.columns = (curvas_colnames)
+    curvas = curvas[curvas.columns.intersection(curvas_list)]
+    curvas.columns = (curvas_colnames)
 
-curvas = curvas[(curvas['Eonia'] != "_")]
-curvas.rename_axis(None, inplace=True)
-curvas.sort_values(by='Fecha', ascending=False, inplace=True)
-curvas = homogeneizar(curvas, fecha_inicio, fecha_fin)
-curvas['Eonia'] = curvas['Eonia'].apply(
-    pd.to_numeric, errors='coerce')
-curvas['Eonia'] = np.log((1+curvas['Eonia'])**(1/365))
-curvas.set_index(curvas['Fecha'], inplace=True)
+    curvas = curvas[(curvas['Eonia'] != "_")]
+    curvas.rename_axis(None, inplace=True)
+    curvas.sort_values(by='Fecha', ascending=False, inplace=True)
+    curvas = homogeneizar(curvas, fecha_inicio, fecha_fin)
+    curvas['Eonia'] = curvas['Eonia'].apply(
+        pd.to_numeric, errors='coerce')
+    curvas['Eonia'] = np.log((1+curvas['Eonia'])**(1/365))
+    curvas.set_index(curvas['Fecha'], inplace=True)
 
-curvas_fin = curvas.filter(['Eonia'], axis=1)
+    curvas_fin = curvas.filter(['Eonia'], axis=1)
 
     return curvas_fin
 
 
-def descarga_limpieza_homogeneizacion_desmanipulacion(indice, fecha_inicio, fecha_fin, ventana):
+def guardame_todo(tickers_indices, urls_indices, fecha_inicio, fecha_fin, ventana, Downloaded_files_path, save_in_file=False):
+    for indice, ticker in zip(urls_indices, tickers_indices):
+        guarda_stocks_de_indice(indice, ticker, fecha_inicio,
+                                fecha_fin, ventana, Downloaded_files_path, True)
 
-    # Funcion principal
+
+def guarda_stocks_de_indice(indice, ticker_indice, fecha_inicio, fecha_fin, ventana, Downloaded_files_path, save_in_file=False):
+    directory = Downloaded_files_path+r'\'' + ticker_indice
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+    os.chdir(directory)
     fecha_inicio = encontrar_fecha_anterior_inicio(fecha_inicio, ventana)
     info_activos = obtener_info_activos(indice)
-    info_activos.to_csv('info_activos2.csv', sep=';')
+    info_activos.to_csv('info_activos.csv', sep=';')
     datos_descargados = generar_df_activos(
-        info_activos, fecha_inicio, fecha_fin)
+        info_activos, fecha_inicio, fecha_fin, save_in_file)
+
+
+def descarga_limpieza_homogeneizacion_desmanipulacion(indice, ticker_indice, fecha_inicio, fecha_fin, ventana, Downloaded_files_path, save_in_file=False):
+
+    # Funcion principal
+    directory = Downloaded_files_path+'\ticker_indice'
+    if not os.path.exists(directory):
+        os.makedirs(directory)
+    os.chdir(directory)
+    fecha_inicio = encontrar_fecha_anterior_inicio(fecha_inicio, ventana)
+    info_activos = obtener_info_activos(indice)
+    info_activos.to_csv('info_activos.csv', sep=';')
+    datos_descargados = generar_df_activos(
+        info_activos, fecha_inicio, fecha_fin, save_in_file)
 
     # Obtenemos la información del índice.
 
@@ -482,7 +518,9 @@ def descarga_limpieza_homogeneizacion_desmanipulacion(indice, fecha_inicio, fech
 
 
 # %%
-datos_descargados = descarga_limpieza_homogeneizacion_desmanipulacion(
-    indice, fecha_inicio, fecha_fin, ventana)
+# datos_descargados = descarga_limpieza_homogeneizacion_desmanipulacion(
+#     indice, fecha_inicio, fecha_fin, ventana)
 
 # %%
+guardame_todo(tickers_indices, urls_indices, fecha_inicio,
+              fecha_fin, ventana, Downloaded_files_path, save_in_file=False)
