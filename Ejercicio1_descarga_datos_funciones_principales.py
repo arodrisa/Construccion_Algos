@@ -36,11 +36,10 @@ import random
 #                 "https://es.investing.com/indices/investing.com-uk-100-components", "https://es.investing.com/indices/us-30-components",
 #                 "https://es.investing.com/indices/ibex-medium-cap-components", "https://es.investing.com/indices/ibex-small-cap-components",
 #                 "https://es.investing.com/indices/hang-sen-40-components"]
-nombres_indices = ["Bovespa", "Nikkei 225", "Reino Unido 100",
+nombres_indices = ["Reino Unido 100",
                    "Dow Jones Industrial Average", "IBEX Medium Cap", "IBEX Small Cap", "Hang Seng"]
-tickers_indices = ["BVSP", "N225", "invuk100", "DJI", "IBEXC", "IBEXS", "HSI"]
-urls_indices = ["https://es.investing.com/indices/bovespa-components", "https://es.investing.com/indices/japan-ni225-components",
-                "https://es.investing.com/indices/investing.com-uk-100-components", "https://es.investing.com/indices/us-30-components",
+tickers_indices = ["invuk100", "DJI", "IBEXC", "IBEXS", "HSI"]
+urls_indices = ["https://es.investing.com/indices/investing.com-uk-100-components", "https://es.investing.com/indices/us-30-components",
                 "https://es.investing.com/indices/ibex-medium-cap-components", "https://es.investing.com/indices/ibex-small-cap-components",
                 "https://es.investing.com/indices/hang-sen-40-components"]
 
@@ -58,7 +57,6 @@ fecha_fin = datetime.datetime.strptime(fecha_fin, '%d/%m/%Y')
 Downloaded_files_path = r'C:\Users\arodr\Google Drive\Master_MIAX\hist_data\investing'
 indice = tabla_indices.loc[1, 'urls_indices']
 url = indice
-save_in_file = False
 
 
 def encontrar_fecha_anterior_inicio(fecha_inicio, ventana):
@@ -83,19 +81,30 @@ def composicion_indice(url):
     for row in rows[1:len(rows)]:
         cols = row.find_all('td')
         cols = [ele.text.strip() for ele in cols]
+        # Select column tables
         temp_data = [ele for ele in cols if ele]
-        temp_data.append('https://es.investing.com' +
-                         row.find('a')['href']+'-historical-data')
+        # Add link to the asset
+        temp_link = row.find('a')['href']
+        if('?cid=' in temp_link):
+            p = re.compile('\?cid=\d*')
+            c_id = p.findall(temp_link)
+            link = temp_link.replace(c_id[0], '')
+            temp_data.append('https://es.investing.com' +
+                             link + '-historical-data'+c_id[0])
+            print(f'https://es.investing.com{link}-historical-data{c_id[0]}')
+        else:
+            temp_data.append('https://es.investing.com' +
+                             temp_link + '-historical-data')
 
         data.append(temp_data)
         # data.append([ele for ele in cols if ele],cols.find('a')['href'])
 
-    temp = rows[0].find_all('th')
-    temp = [ele.text.strip() for ele in temp]
-    temp = temp[1:(len(temp)-1)]
-    temp.append('link')
+    header = rows[0].find_all('th')
+    header_item = [ele.text.strip() for ele in header]
+    header_items = header_item[1:(len(header_item)-1)]
+    header_items.append('link')
 
-    index_components = pd.DataFrame(data, columns=temp)
+    index_components = pd.DataFrame(data, columns=header_items)
 
     return index_components.loc[:, ['Nombre', 'link']]
 
@@ -311,7 +320,7 @@ def split_contrasplit(cotizaciones):
     return cotizaciones
 
 
-def generar_df_activos(info_activos, fecha_inicio, fecha_fin, save_in_file):
+def generar_df_activos(info_activos, fecha_inicio, fecha_fin):
     print("Iniciando el proceso de descarga de datos")
     # url_activo = "https://es.investing.com/equities/pharma-mar-sau-historical-data"
     activo = 1
@@ -334,11 +343,7 @@ def generar_df_activos(info_activos, fecha_inicio, fecha_fin, save_in_file):
         # Limpiamos los datos descargados.
         #   cotizaciones<-limpiar(cotizaciones)
         cotizaciones = limpiar(cotizaciones)
-        if(save_in_file):
-            filename = info_activos.loc[activo, 'Nombre'] + \
-                '_' + info_activos.loc[activo, 'ticker']
-            filename = ''.join(e for e in filename if e.isalnum())
-            cotizaciones.to_csv(filename+'.csv', sep=';')
+
         # Homogeneizamos los datos descargados.
         #   cotizaciones<-homogeneizar(cotizaciones, fecha_inicio, fecha_fin)
         cotizaciones = homogeneizar(cotizaciones, fecha_inicio, fecha_fin)
@@ -466,25 +471,59 @@ def obtener_info_renta_fija(fecha_inicio, fecha_fin):
     return curvas_fin
 
 
-def guardame_todo(tickers_indices, urls_indices, fecha_inicio, fecha_fin, ventana, Downloaded_files_path, save_in_file=False):
+def guardame_todo(tickers_indices, urls_indices, fecha_inicio, fecha_fin, ventana, Downloaded_files_path):
     for indice, ticker in zip(urls_indices, tickers_indices):
         guarda_stocks_de_indice(indice, ticker, fecha_inicio,
-                                fecha_fin, ventana, Downloaded_files_path, True)
+                                fecha_fin, ventana, Downloaded_files_path)
 
 
-def guarda_stocks_de_indice(indice, ticker_indice, fecha_inicio, fecha_fin, ventana, Downloaded_files_path, save_in_file=False):
+def guarda_stocks_de_indice(indice, ticker_indice, fecha_inicio, fecha_fin, ventana, Downloaded_files_path):
+    log = []
     directory = Downloaded_files_path+r'\'' + ticker_indice
     if not os.path.exists(directory):
         os.makedirs(directory)
     os.chdir(directory)
-    fecha_inicio = encontrar_fecha_anterior_inicio(fecha_inicio, ventana)
     info_activos = obtener_info_activos(indice)
     info_activos.to_csv('info_activos.csv', sep=';')
-    datos_descargados = generar_df_activos(
-        info_activos, fecha_inicio, fecha_fin, save_in_file)
+    for activo in info_activos.index:
+        try:
+            time.sleep(random.randint(1, 5))
+        # Descargamos las cotizaciones de los activos.
+            print(activo)
+            # cotizaciones = descargar_cotizaciones_diarias_investing(
+            #     url_activo=info_activos.loc[activo], fecha_inicio=fecha_inicio, fecha_fin=fecha_fin)
+            cotizaciones = descargar_cotizaciones_diarias_investing(
+                url_activo=info_activos.loc[activo]['link'], fecha_inicio=fecha_inicio, fecha_fin=fecha_fin)
+
+            # cotizaciones.to_csv(info_activos.loc[0]['Nombre']+'.csv', sep=';')
+            if(cotizaciones.empty):
+                cotizaciones = descargar_cotizaciones_diarias_investing_api(
+                    info_activos.loc[activo], fecha_inicio=fecha_inicio, fecha_fin=fecha_fin)
+
+            # Limpiamos los datos descargados.
+            #   cotizaciones<-limpiar(cotizaciones)
+            cotizaciones = limpiar(cotizaciones)
+
+            filename = info_activos.loc[activo, 'Nombre'] + \
+                '_' + info_activos.loc[activo, 'ticker']
+            filename = ''.join(e for e in filename if e.isalnum())
+            cotizaciones.to_csv(filename+'.csv', sep=';')
+        except Exception:
+            log.append(
+                f'Could not retrieve data from stock:{info_activos.loc[activo]["ticker"]} and url {info_activos.loc[activo]["link"]}')
+            pass
+        finally:
+            if len(log) > 0:
+                with open('log.txt', mode='wt', encoding='utf-8') as myfile:
+                    myfile.write('\n'.join(log))
+                with open('log.txt', mode='wt', encoding='utf-8') as myfile:
+                    myfile.writelines(log)
+            else:
+                with open('log.txt', mode='wt', encoding='utf-8') as myfile:
+                    myfile.writelines('no errors while downloading')
 
 
-def descarga_limpieza_homogeneizacion_desmanipulacion(indice, ticker_indice, fecha_inicio, fecha_fin, ventana, Downloaded_files_path, save_in_file=False):
+def descarga_limpieza_homogeneizacion_desmanipulacion(indice, ticker_indice, fecha_inicio, fecha_fin, ventana, Downloaded_files_path):
 
     # Funcion principal
     directory = Downloaded_files_path+'\ticker_indice'
@@ -495,7 +534,7 @@ def descarga_limpieza_homogeneizacion_desmanipulacion(indice, ticker_indice, fec
     info_activos = obtener_info_activos(indice)
     info_activos.to_csv('info_activos.csv', sep=';')
     datos_descargados = generar_df_activos(
-        info_activos, fecha_inicio, fecha_fin, save_in_file)
+        info_activos, fecha_inicio, fecha_fin)
 
     # Obtenemos la información del índice.
 
@@ -521,6 +560,7 @@ def descarga_limpieza_homogeneizacion_desmanipulacion(indice, ticker_indice, fec
 # datos_descargados = descarga_limpieza_homogeneizacion_desmanipulacion(
 #     indice, fecha_inicio, fecha_fin, ventana)
 
+
 # %%
 guardame_todo(tickers_indices, urls_indices, fecha_inicio,
-              fecha_fin, ventana, Downloaded_files_path, save_in_file=False)
+              fecha_fin, ventana, Downloaded_files_path)
