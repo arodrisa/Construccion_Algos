@@ -26,20 +26,14 @@ import random
 
 # %%
 # Variables
-# nombres_indices = ["Euro Stoxx 50", "IBEX 35", "S&P 500", "DAX", "Bovespa", "Nikkei 225", "Reino Unido 100",
-#                    "Dow Jones Industrial Average", "IBEX Medium Cap", "IBEX Small Cap", "Hang Seng"]
-# tickers_indices = ["STOXX50E", "IBEX", "SPX", "GDAXI",
-#                    "BVSP", "N225", "invuk100", "DJI", "IBEXC", "IBEXS", "HSI"]
-# urls_indices = ["https://es.investing.com/indices/eu-stoxx50-components", "https://es.investing.com/indices/spain-35-components",
-#                 "https://es.investing.com/indices/us-spx-500-components", "https://es.investing.com/indices/germany-30-components",
-#                 "https://es.investing.com/indices/bovespa-components", "https://es.investing.com/indices/japan-ni225-components",
-#                 "https://es.investing.com/indices/investing.com-uk-100-components", "https://es.investing.com/indices/us-30-components",
-#                 "https://es.investing.com/indices/ibex-medium-cap-components", "https://es.investing.com/indices/ibex-small-cap-components",
-#                 "https://es.investing.com/indices/hang-sen-40-components"]
-nombres_indices = ["Reino Unido 100",
+nombres_indices = ["Euro Stoxx 50", "IBEX 35", "S&P 500", "DAX", "Bovespa", "Nikkei 225", "Reino Unido 100",
                    "Dow Jones Industrial Average", "IBEX Medium Cap", "IBEX Small Cap", "Hang Seng"]
-tickers_indices = ["invuk100", "DJI", "IBEXC", "IBEXS", "HSI"]
-urls_indices = ["https://es.investing.com/indices/investing.com-uk-100-components", "https://es.investing.com/indices/us-30-components",
+tickers_indices = ["STOXX50E", "IBEX", "SPX", "GDAXI",
+                   "BVSP", "N225", "invuk100", "DJI", "IBEXC", "IBEXS", "HSI"]
+urls_indices = ["https://es.investing.com/indices/eu-stoxx50-components", "https://es.investing.com/indices/spain-35-components",
+                "https://es.investing.com/indices/us-spx-500-components", "https://es.investing.com/indices/germany-30-components",
+                "https://es.investing.com/indices/bovespa-components", "https://es.investing.com/indices/japan-ni225-components",
+                "https://es.investing.com/indices/investing.com-uk-100-components", "https://es.investing.com/indices/us-30-components",
                 "https://es.investing.com/indices/ibex-medium-cap-components", "https://es.investing.com/indices/ibex-small-cap-components",
                 "https://es.investing.com/indices/hang-sen-40-components"]
 
@@ -523,13 +517,10 @@ def guarda_stocks_de_indice(indice, ticker_indice, fecha_inicio, fecha_fin, vent
                     myfile.writelines('no errors while downloading')
 
 
-def descarga_limpieza_homogeneizacion_desmanipulacion(indice, ticker_indice, fecha_inicio, fecha_fin, ventana, Downloaded_files_path):
+def descarga_limpieza_homogeneizacion_desmanipulacion(indice, fecha_inicio, fecha_fin, ventana):
 
     # Funcion principal
-    directory = Downloaded_files_path+'\ticker_indice'
-    if not os.path.exists(directory):
-        os.makedirs(directory)
-    os.chdir(directory)
+
     fecha_inicio = encontrar_fecha_anterior_inicio(fecha_inicio, ventana)
     info_activos = obtener_info_activos(indice)
     info_activos.to_csv('info_activos.csv', sep=';')
@@ -557,10 +548,10 @@ def descarga_limpieza_homogeneizacion_desmanipulacion(indice, ticker_indice, fec
 
 
 # %%
-# datos_descargados = descarga_limpieza_homogeneizacion_desmanipulacion(
-#     indice, fecha_inicio, fecha_fin, ventana)
+datos_descargados = descarga_limpieza_homogeneizacion_desmanipulacion(
+    indice,fecha_inicio, fecha_fin, ventana)
 
 
 # %%
-guardame_todo(tickers_indices, urls_indices, fecha_inicio,
-              fecha_fin, ventana, Downloaded_files_path)
+# guardame_todo(tickers_indices, urls_indices, fecha_inicio,
+#             fecha_fin, ventana, Downloaded_files_path)
