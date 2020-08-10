@@ -1,0 +1,36 @@
+;Nombre;link;ticker;currency;ISIN;market
+0;Acciona;https://es.investing.com/equities/acciona-sa-historical-data;ANA;EUR;ES0125220311;spain
+1;Acerinox;https://es.investing.com/equities/acerinox-historical-data;ACX;EUR;ES0132105018;spain
+2;ACS;https://es.investing.com/equities/acs-cons-y-serv-historical-data;ACS;EUR;ES0167050915;spain
+3;Aena;https://es.investing.com/equities/aena-aeropuertos-sa-historical-data;AENA;EUR;ES0105046009;spain
+4;Almirall;https://es.investing.com/equities/almirall-sa-historical-data;ALM;EUR;ES0157097017;spain
+5;Amadeus;https://es.investing.com/equities/amadeus-historical-data;AMA;EUR;ES0109067019;spain
+6;ArcelorMittal;https://es.investing.com/equities/arcelormittal-reg-historical-data?cid=32439;MTS;EUR;LU1598757687;spain
+7;Banco Sabadell;https://es.investing.com/equities/bco-de-sabadell-historical-data;SABE;EUR;ES0113860A34;spain
+8;Bankia;https://es.investing.com/equities/bankia-historical-data;BKIA;EUR;ES0113307062;spain
+9;Bankinter;https://es.investing.com/equities/bankinter-historical-data;BKT;EUR;ES0113679I37;spain
+10;BBVA;https://es.investing.com/equities/bbva-historical-data;BBVA;EUR;ES0113211835;spain
+11;CaixaBank;https://es.investing.com/equities/caixabank-sa-historical-data;CABK;EUR;ES0140609019;spain
+12;Cellnex Telecom;https://es.investing.com/equities/cellnex-telecom-historical-data;CLNX;EUR;ES0105066007;spain
+13;Cie Automotive;https://es.investing.com/equities/cie-automotive-sa-historical-data;CIEA;EUR;ES0105630315;spain
+14;Colonial;https://es.investing.com/equities/inmob-colonial-historical-data;COL;EUR;ES0139140174;spain
+15;Enagás;https://es.investing.com/equities/enagas-historical-data;ENAG;EUR;ES0130960018;spain
+16;ENCE;https://es.investing.com/equities/ence-energia-y-celulosa-sa-historical-data;ENC;EUR;ES0130625512;spain
+17;Endesa;https://es.investing.com/equities/endesa-historical-data;ELE;EUR;ES0130670112;spain
+18;Ferrovial;https://es.investing.com/equities/grupo-ferrovial-historical-data;FER;EUR;ES0118900010;spain
+19;Grifols;https://es.investing.com/equities/grifols-historical-data;GRLS;EUR;ES0171996087;spain
+20;IAG;https://es.investing.com/equities/intl.-cons.-air-grp-historical-data?cid=13809;ICAG;EUR;ES0177542018;spain
+21;Iberdrola;https://es.investing.com/equities/iberdrola-historical-data;IBE;EUR;ES0144580Y14;spain
+22;Inditex;https://es.investing.com/equities/inditex-historical-data;ITX;EUR;ES0148396007;spain
+23;Indra;https://es.investing.com/equities/indra-sistemas-historical-data;IDR;EUR;ES0118594417;spain
+24;Mapfre;https://es.investing.com/equities/mapfre-historical-data;MAP;EUR;ES0124244E34;spain
+25;MásMóvil;https://es.investing.com/equities/world-wide-web-ibercom-s.a.-historical-data;MASM;EUR;ES0184696104;spain
+26;Meliá Hotels;https://es.investing.com/equities/melia-hotels-international-sa-historical-data;MEL;EUR;ES0176252718;spain
+27;Merlin Properties;https://es.investing.com/equities/merlin-properties-sa-historical-data;MRL;EUR;ES0105025003;spain
+28;Naturgy Energy;https://es.investing.com/equities/gas-natural-sdg-historical-data;NTGY;EUR;ES0116870314;spain
+29;Red Eléctrica;https://es.investing.com/equities/red-electrica-historical-data;REE;EUR;ES0173093024;spain
+30;Repsol;https://es.investing.com/equities/repsol-ypf-historical-data;REP;EUR;ES0173516115;spain
+31;Santander;https://es.investing.com/equities/banco-santander-historical-data;SAN;EUR;ES0113900J37;spain
+32;Siemens Gamesa;https://es.investing.com/equities/gamesa-historical-data;SGREN;EUR;ES0143416115;spain
+33;Telefónica;https://es.investing.com/equities/telefonica-historical-data;TEF;EUR;ES0178430E18;spain
+34;Viscofan;https://es.investing.com/equities/viscofan-sa-historical-data;VIS;EUR;ES0184262212;spain

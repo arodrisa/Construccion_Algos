@@ -19,7 +19,7 @@ import matplotlib.pyplot as plt
 from random import sample
 from tqdm import tqdm, tqdm_notebook
 import random
-
+import math
 
 # import sys
 # import seaborn as sns
@@ -42,9 +42,19 @@ tabla_indices = pd.DataFrame(
 tabla_indices
 ventana = 30
 # date_time_str = "01/01/2018"
-fecha_inicio = "01/01/1990"
-fecha_fin = "27/07/2020"
+# fecha_inicio = "01/01/1990"
+# fecha_fin = "27/07/2020"
+fecha_inicio = "01/01/2018"
+fecha_fin = "31/12/2018"
 ventana = 30
+entrada = 0.15
+salida = 0.85
+percentil_dinamico = True
+comision = 0.0008
+comision_minima = 8
+beneficio_objetivo_por_operacion = 100
+stop_loss = 5
+asignacion_maxima = 50000
 user_agent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.89 Safari/537.36'
 fecha_inicio = datetime.datetime.strptime(fecha_inicio, '%d/%m/%Y')
 fecha_fin = datetime.datetime.strptime(fecha_fin, '%d/%m/%Y')
@@ -335,11 +345,11 @@ def generar_df_activos(info_activos, fecha_inicio, fecha_fin):
                 info_activos.loc[activo], fecha_inicio=fecha_inicio, fecha_fin=fecha_fin)
 
         # Limpiamos los datos descargados.
-        #   cotizaciones<-limpiar(cotizaciones)
+        #   cotizaciones=limpiar(cotizaciones)
         cotizaciones = limpiar(cotizaciones)
 
         # Homogeneizamos los datos descargados.
-        #   cotizaciones<-homogeneizar(cotizaciones, fecha_inicio, fecha_fin)
+        #   cotizaciones=homogeneizar(cotizaciones, fecha_inicio, fecha_fin)
         cotizaciones = homogeneizar(cotizaciones, fecha_inicio, fecha_fin)
         # Eliminamos los split y contrasplit.
         cotizaciones = split_contrasplit(cotizaciones)
@@ -413,7 +423,7 @@ def otener_info_divisa(divisa, fecha_inicio, fecha_fin):
     # Homogeneizamos los datos descargados.
     cotizaciones_divisa = homogeneizar(
         cotizaciones_divisa, fecha_inicio, fecha_fin)
-
+    cotizaciones_divisa.index = cotizaciones_divisa.iloc[:, 0]
     return cotizaciones_divisa.iloc[:, 1:-1]
 
 
@@ -495,7 +505,7 @@ def guarda_stocks_de_indice(indice, ticker_indice, fecha_inicio, fecha_fin, vent
                     info_activos.loc[activo], fecha_inicio=fecha_inicio, fecha_fin=fecha_fin)
 
             # Limpiamos los datos descargados.
-            #   cotizaciones<-limpiar(cotizaciones)
+            #   cotizaciones=limpiar(cotizaciones)
             cotizaciones = limpiar(cotizaciones)
 
             filename = info_activos.loc[activo, 'Nombre'] + \
@@ -549,7 +559,7 @@ def descarga_limpieza_homogeneizacion_desmanipulacion(indice, fecha_inicio, fech
 
 # %%
 datos_descargados = descarga_limpieza_homogeneizacion_desmanipulacion(
-    indice,fecha_inicio, fecha_fin, ventana)
+    indice, fecha_inicio, fecha_fin, ventana)
 
 
 # %%
