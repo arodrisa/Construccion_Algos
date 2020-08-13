@@ -12,8 +12,8 @@ def calculamos_alpha(datos_descargados, ventana):
     renta_fija = datos_descargados[7].iloc[:, 0]
 
     # Calculamos la rentabilidad de los activos.
-    cierre_log_ret = np.log(cierre.sort_index(ascending=True)).diff()
-    indice_log_ret = np.log(indice.sort_index(ascending=True)).diff()
+    cierre_log_ret = np.log(cierre.sort_index(ascending=True)).diff().fillna(0)
+    indice_log_ret = np.log(indice.sort_index(ascending=True)).diff().fillna(0)
 
     renta_fija_ret = renta_fija/100
     renta_fija_ret.sort_index(ascending=True, inplace=True)
@@ -40,14 +40,14 @@ def calculamos_alpha(datos_descargados, ventana):
 
 
 def precio_objetivo(alpha_objetivo, cotizaciones_activo, cotizaciones_indice, cotizaciones_renta_fija):
-    dia = temp_alpha_actual.index[0]
-    activo = alpha_actual.columns[0]
-    alpha_objetivo = alpha_objetivo.loc[dia, activo]
-    cotizaciones_activo = cierre.loc[dia:(dia - BDay(ventana)), activo]
-    cotizaciones_indice = indice.loc[dia:(dia - BDay(ventana)), :]
-    cotizaciones_renta_fija = renta_fija.loc[dia:(dia - BDay(ventana))]
-    alpha_objetivo = alpha_entrada.loc[dia, activo]
-# cotizaciones_activo = cierre.loc[dia:(dia - BDay(ventana)), activo]
+    # dia = temp_alpha_actual.index[0]
+    # activo = alpha_actual.columns[0]
+    # # alpha_objetivo = alpha_objetivo.loc[dia, activo]
+    # cotizaciones_activo = cierre.loc[dia:(dia - BDay(ventana)), activo]
+    # cotizaciones_indice = indice.loc[dia:(dia - BDay(ventana)), :]
+    # cotizaciones_renta_fija = renta_fija.loc[dia:(dia - BDay(ventana))]
+    # alpha_objetivo = alpha_entrada.loc[dia, activo]
+    # cotizaciones_activo = cierre.loc[dia:(dia - BDay(ventana)), activo]
     # cotizaciones_indice = indice.loc[dia:(dia - BDay(ventana)), :]
     # cotizaciones_renta_fija = renta_fija.loc[dia:(dia - BDay(ventana))]
     # Calculamos la rentabilidad de los activos, su benchmark y el eonia.
@@ -204,9 +204,13 @@ def seleccion_activos(datos_descargados, ventana, entrada, salida, percentil_din
     divisa = datos_descargados[6]
     renta_fija = datos_descargados[7].iloc[:, 0]
 
-    fecha_inicio_calculos = fecha_inicio - BDay(ventana)
-    date_calculos_mask = (alpha_actual.index >= fecha_inicio_calculos)
+    fecha_inicio_datos = fecha_inicio - BDay(2*ventana)
+    date_calculos_mask = (alpha_actual.index >= fecha_inicio_datos)
     temp_alpha_actual = alpha_actual[date_calculos_mask].sort_index(
+        ascending=True)
+    fecha_inicio_calculos = fecha_inicio - BDay(ventana)
+    date_datos_mask = (alpha_actual.index >= fecha_inicio_calculos)
+    temp_fechas = alpha_actual[date_datos_mask].sort_index(
         ascending=True)
     # alpha_entrada = pd.DataFrame(
     #     0, index=alpha_actual.index[date_calculos_mask], columns=alpha_actual.columns)
@@ -241,7 +245,7 @@ def seleccion_activos(datos_descargados, ventana, entrada, salida, percentil_din
     ventana_dinamica = pd.DataFrame(
         ventana, index=temp_alpha_actual.index, columns=alpha_actual.columns)
 
-    for dia in temp_alpha_actual.index:
+    for dia in temp_fechas.index:
         for activo in alpha_actual.columns:
             if percentil_dinamico:
                 if (fecha_inicio_calculos != dia):
