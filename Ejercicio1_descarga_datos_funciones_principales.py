@@ -452,7 +452,7 @@ def obtener_info_renta_fija(fecha_inicio, fecha_fin):
     curvas.columns = curvas.iloc[2]
     curvas.rename(columns={curvas.columns[0]: "Fecha"}, inplace=True)
 
-    curvas = curvas.iloc[5:-2, :]
+    curvas = curvas.iloc[5: -2, :]
     for key in monthdic:
         curvas['Fecha'] = curvas['Fecha'].str.replace(key, monthdic[key])
 
@@ -498,12 +498,12 @@ def guarda_stocks_de_indice(indice, ticker_indice, fecha_inicio, fecha_fin, vent
             # cotizaciones = descargar_cotizaciones_diarias_investing(
             #     url_activo=info_activos.loc[activo], fecha_inicio=fecha_inicio, fecha_fin=fecha_fin)
             cotizaciones = descargar_cotizaciones_diarias_investing(
-                url_activo=info_activos.loc[activo]['link'], fecha_inicio=fecha_inicio, fecha_fin=fecha_fin)
+                info_activos.loc[activo]['link'], fecha_inicio, fecha_fin)
 
             # cotizaciones.to_csv(info_activos.loc[0]['Nombre']+'.csv', sep=';')
             if(cotizaciones.empty):
                 cotizaciones = descargar_cotizaciones_diarias_investing_api(
-                    info_activos.loc[activo], fecha_inicio=fecha_inicio, fecha_fin=fecha_fin)
+                    info_activos.loc[activo], fecha_inicio, fecha_fin)
 
             # Limpiamos los datos descargados.
             #   cotizaciones=limpiar(cotizaciones)
