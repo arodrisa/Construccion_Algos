@@ -1,12 +1,12 @@
 # %%
 # Libraries
-from urllib.request import Request, urlopen
-import urllib
+# from urllib.request import Request, urlopen
+# import urllib
 from bs4 import BeautifulSoup as bs
 from pandas.tseries.offsets import BDay
-from functools import partial
-import itertools
-import multiprocessing as mp
+# from functools import partial
+# import itertools
+# import multiprocessing as mp
 import requests
 import datetime
 import os
@@ -15,12 +15,12 @@ import re
 import pandas as pd
 import numpy as np
 import time
-import matplotlib.pyplot as plt
-from random import sample
-from tqdm import tqdm, tqdm_notebook
+# import matplotlib.pyplot as plt
+# from random import sample
+# from tqdm import tqdm, tqdm_notebook
 import random
-import math
-import xlsxwriter
+# import math
+# import xlsxwriter
 
 # import sys
 # import seaborn as sns
@@ -65,12 +65,23 @@ url = indice
 
 
 def encontrar_fecha_anterior_inicio(fecha_inicio, ventana):
+    """ Finds previous starting date
+
+    args:
+        fecha_inicio(dateTime): start date
+        ventana(int):window size
+        """
     fecha_anterior_inicio = fecha_inicio - BDay(ventana*2)
     return fecha_anterior_inicio
 
 
 def composicion_indice(url):
+    """ Returns a dataframe with the name of stocks and url for a given url index. 
 
+    args:
+        url(string): index investing.com url
+        
+    """
     html_requested_data = requests.get(
         url, headers={'User-Agent': 'Mozilla/5.0'})
     webpage = bs(html_requested_data.content, 'html.parser')
